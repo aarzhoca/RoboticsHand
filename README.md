@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Glove-Controlled 3D-Printed Robotic Hand (NuMaker-M258KG + Amazing Hand)
 
 An entry-level, non-Arduino robotic hand project using:
@@ -216,3 +217,7 @@ Possible next steps:
 ## Contact
 
 (Add your contact or project communication channel here.)
+=======
+# RoboticsHand
+3D-printed robotic hand with NuMaker
+>>>>>>> 2bda626164ed830d4f05822a7dfeda8da8062dd8
