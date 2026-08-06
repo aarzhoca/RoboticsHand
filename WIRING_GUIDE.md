@@ -2,170 +2,147 @@
 
 ## Overview
 
-This guide covers the wiring for:
+This guide covers wiring for:
 
 - **NuMaker-M258KG** as the main MCU board.
-- **Feetech SCS0009** serial bus servos (8 total).
-- **Amazing Hand** mechanical platform.
+- **Bus Servo Driver Board** (Seeed / ST/SC series).
+- **Feetech SCS0009** serial bus servos inside the Amazing Hand.
 - **5 V regulated power supply** with bulk decoupling.
 
-The servos use a **half-duplex serial bus** (TTL-level), not PWM. All servos share the same signal line in a daisy-chain configuration. [web:156][web:176][web:179]
+The servos are controlled via a **bus servo driver board**, which handles power distribution and UART communication. The MCU talks to the driver board; the driver board talks to the servos.
 
 ---
 
 ## Safety first
 
-- **Always power off** before connecting or disconnecting any wires.
-- **Never power servos from the MCU 3.3 V or 5 V pins.**
-- Use an **external 5 V supply** for the servo rail.
-- Ensure **common ground** between the MCU and servo supply.
-- Start with **one servo** and verify before connecting all 8. [web:180][web:181]
+- Power off before changing any connections.
+- Do not power servos from the MCU’s 3.3 V or 5 V pins.
+- Use an external regulated supply for servo power.
+- Ensure **common ground** between MCU and driver board.
+- Start with one or two servos before connecting all 8.
 
 ---
 
 ## Power system
 
-### Servo power rail
+### 5 V adapter
 
-- **Supply:** Regulated 5 V, 5 A recommended.
-- **Connections:**
-  - **+5 V** from supply -> servo VCC rail.
-  - **GND** from supply -> servo GND rail.
-- **Bulk capacitor:**
-  - Connect a **4700 µF / 16 V electrolytic capacitor** across the servo rail:
-    - Positive lead -> +5 V rail.
-    - Negative lead -> GND rail.
-  - Place the capacitor as close as practical to the servo power input.
+- Use a regulated **5 V adapter** (2–5 A).
+- Connect the adapter to the **Bus Servo Driver Board** power input:
+  - Either via the **DC barrel jack** (5.5 × 2.1 mm), or
+  - Via the **2P 3.5 mm screw terminal**, depending on the board version.
+- Confirm polarity (+ and −) before powering on.
+
+### Bulk capacitor
+
+- Place a **4700 µF / 16 V electrolytic capacitor** across the driver board power input:
+  - Positive lead -> +5 V terminal.
+  - Negative lead -> GND terminal.
+- This helps smooth current spikes from servos.
 
 ### MCU power
 
-- The **NuMaker-M258KG** is typically powered via USB or an on-board regulator.
-- Do **not** connect the servo +5 V to any MCU power pin.
-- Only connect **GND** between the MCU and servo supply.
+- Power the **NuMaker-M258KG** via USB or its own supply.
+- Do not tie the servo +5 V to any MCU power pins.
+- Connect **MCU GND** to the driver board GND.
 
 ---
 
-## Servo wiring
+## Bus Servo Driver Board connections
 
-### Feetech SCS0009 connector
+### Power
 
-Each SCS0009 servo has a 3-wire connector:
+- 5 V adapter -> driver board power input.
+- Driver board -> distributes power to all servo VCC/GND pins.
 
-- **VCC** (red)
-- **GND** (black or brown)
-- **Signal** (yellow or orange)
+### UART
 
-The servos are daisy-chained on the signal line:
+- Choose a UART on the NuMaker-M258KG (e.g., UART0 or UART1).
+- Connect:
+  - **MCU UART TX** -> driver board UART RX.
+  - **MCU UART RX** -> driver board UART TX.
+  - **MCU GND** -> driver board GND.
 
-- **VCC** and **GND** are shared for all servos.
-- **Signal** is a single wire that connects to all servos in parallel. [web:175][web:178]
-
-### Daisy-chain wiring
-
-For each servo:
-
-1. Connect **VCC** to the +5 V servo rail.
-2. Connect **GND** to the GND servo rail.
-3. Connect **Signal** to the shared signal bus.
-
-The signal bus is a single wire that runs from the MCU UART TX/RX pin to each servo signal pin.
+Consult the NuMaker-M258KG user manual for the exact UART pin names and header locations.
 
 ---
 
-## NuMaker-M258KG connections
+## Servo connections
 
-### UART for servo bus
+### SCS0009 servo wiring
 
-The SCS0009 uses a half-duplex serial bus. You will use one UART on the NuMaker-M258KG:
+Each SCS0009 servo has 3 lines:
 
-- **UART TX** and **RX** are tied together to form a single half-duplex line.
-- This line connects to the **signal bus** for all servos.
+- VCC (red)
+- GND (black/brown)
+- Signal (yellow/orange)
 
-Example (adjust to your chosen UART pins):
+On the Bus Servo Driver Board:
 
-- **UARTn_TX** -> servo signal bus
-- **UARTn_RX** -> servo signal bus
-- **MCU GND** -> servo GND rail
+- Connect each servo’s connector to a servo port (3P terminal).
+- The board internally shares power and signal lines for all servos.
 
-Check the **NuMaker-M258KG user manual** for available UART pins and pin mapping. [web:168][web:170]
+You do **not** need to wire servos directly to the MCU; the driver board handles the bus.
 
-### Recommended pin selection
+---
 
-- Choose a UART that:
-  - Is available on headers.
-  - Has 3.3 V or 5 V tolerant pins as needed.
-- Ensure the signal level is compatible with the SCS0009 TTL level (typically 3.3 V–5 V logic).
+## Signal flow
 
-If necessary, use a **level-shifter** between the MCU and servo bus.
+```text
+NuMaker-M258KG UART  <-->  Bus Servo Driver Board  <-->  SCS0009 servos (Amazing Hand)
+           ^                     ^                         ^
+           |                     |                         |
+         MCU GND  -----------  Board GND  --------------  Servo GND
+```
 
 ---
 
 ## Step-by-step wiring procedure
 
-### 1. Prepare the power rails
+1. **Connect power to the driver board**
+   - Wire the 5 V adapter to the driver board power input.
+   - Add the bulk capacitor across the input.
+   - Double-check polarity and connections.
 
-- Connect the **5 V supply** to the servo power rails.
-- Add the **bulk capacitor** across the rails.
-- Verify polarity with a multimeter before powering on.
+2. **Connect MCU to driver board**
+   - Wire UART TX/RX and GND between NuMaker-M258KG and the driver board.
+   - Confirm UART settings (baud rate, levels) in firmware.
 
-### 2. Connect the first servo
+3. **Connect one servo**
+   - Plug one SCS0009 into a servo port on the driver board.
+   - Power on and run a simple test to move that servo.
 
-- Connect **VCC** and **GND** to the servo rails.
-- Connect the **signal wire** to the UART half-duplex line.
-- Double-check all connections.
-
-### 3. Connect MCU ground
-
-- Connect **MCU GND** to the servo GND rail.
-- Do **not** connect MCU power pins to the servo rail.
-
-### 4. Power-on test
-
-- Power on the MCU (via USB or debugger).
-- Power on the servo supply.
-- Run a simple test program to:
-  - Initialize the UART.
-  - Send a position command to the servo.
-  - Verify motion.
-
-### 5. Add remaining servos
-
-- Repeat the wiring for each additional servo.
-- Keep the signal bus as a single shared line.
-- Verify each servo individually before full integration.
+4. **Add remaining servos**
+   - Once the first servo works, connect the rest.
+   - Test each servo by ID using your servo driver firmware.
 
 ---
 
 ## Wiring checklist
 
-- [ ] Servo power rail wired to 5 V supply.
-- [ ] Bulk capacitor installed across servo rails.
-- [ ] All servo VCC and GND connected correctly.
-- [ ] Signal bus wired as a single shared line.
-- [ ] UART TX and RX tied together for half-duplex.
-- [ ] MCU GND connected to servo GND.
-- [ ] No MCU power pins connected to servo rail.
-- [ ] Polarity verified with multimeter before power-on.
-- [ ] First servo tested before adding others.
+- [ ] 5 V adapter wired to driver board power input.
+- [ ] Bulk capacitor installed across power input.
+- [ ] MCU GND tied to driver board GND.
+- [ ] UART TX/RX connected between MCU and driver board.
+- [ ] At least one servo connected and tested.
+- [ ] All servos connected only through the driver board (no direct MCU wiring).
 
 ---
 
 ## Common mistakes to avoid
 
-- **Powering servos from the MCU 5 V or 3.3 V pins.**
-- **Forgetting common ground** between MCU and servo supply.
-- **Connecting TX and RX separately** instead of tying them for half-duplex.
-- **Skipping the bulk capacitor**, leading to voltage sag and instability.
-- **Connecting all servos at once** without testing individually. [web:180][web:181]
+- Powering servos directly from MCU pins.
+- Forgetting to share ground between MCU and driver board.
+- Mis-wiring UART TX/RX.
+- Skipping the bulk capacitor, leading to noisy power.
+- Connecting all servos before testing one.
 
 ---
 
 ## Next steps
 
-Once wiring is complete:
+Once wiring is complete and one servo responds correctly:
 
-- Implement the **servo driver** firmware.
-- Test each servo with simple position commands.
-- Proceed to the **motion control layer** and pose primitives.
-
-If you want, I can next generate a **`firmware/servo_driver/`** skeleton with initialization and basic position-command functions for the SCS0009 on NuMaker-M258KG.
+- Implement and refine the `scs0009_servo_driver` firmware.
+- Test control of all servos via the Bus Servo Driver Board.
+- Proceed to motion control and pose primitives.

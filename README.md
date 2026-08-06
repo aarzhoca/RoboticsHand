@@ -7,7 +7,7 @@ An entry-level, non-Arduino robotic hand project using:
 - **Feetech SCS0009** serial bus servos (8 DOF).
 - A **flex-sensor glove** for teleoperation (optional).
 
-This project is designed as a structured **8–12 week training program** for a college sophomore learning embedded systems, mechatronics, and firmware design. [web:168][web:84][web:156]
+This project is designed as a structured **8–12 week training program** for a college sophomore learning embedded systems, mechatronics, and firmware design. 
 
 ---
 
@@ -42,6 +42,30 @@ This project is designed as a structured **8–12 week training program** for a 
 If you get stuck, check [`docs/architecture.md`](docs/architecture.md) for firmware design and [`WIRING_GUIDE.md`](WIRING_GUIDE.md) for wiring details.
 
 ---
+
+## Hardware Overview
+
+This project uses the following main hardware components:
+
+- **Controller (MCU):** Nuvoton NuMaker-M258KG evaluation board, providing the Cortex-M23 microcontroller, on-board Nu-Link2-Me debugger, and UART interface to the servo driver board.
+- **Robotic Hand:** Amazing Hand open-source 3D-printed humanoid hand (8 DOF, 4 fingers), designed to be driven by Feetech serial bus servos.
+- **Servos:** 8 × Feetech SCS0009 serial bus smart servos, mounted inside the Amazing Hand and controlled via a serial bus.
+- **Bus Servo Driver Board:** Seeed Bus Servo Driver Board for ST/SC series servos, which:
+  - Accepts 5–12 V DC input.
+  - Distributes power to all servos.
+  - Provides a UART interface between the MCU and the servo bus.
+- **Power Supply:** External regulated 5 V DC adapter (2–5 A recommended), connected to the Bus Servo Driver Board power input, with a 4700 µF / 16 V bulk capacitor for smoothing.
+
+The signal and power flow is:
+
+```text
+NuMaker-M258KG UART  <-->  Bus Servo Driver Board  <-->  SCS0009 servos (Amazing Hand)
+           ^                     ^                         ^
+           |                     |                         |
+         MCU power           5 V adapter              Servo power
+           |                     |                         |
+         MCU GND  -----------  Board GND  --------------  Servo GND
+```
 
 
 ## System Architecture
