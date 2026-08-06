@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Glove-Controlled 3D-Printed Robotic Hand (NuMaker-M258KG + Amazing Hand)
 
 An entry-level, non-Arduino robotic hand project using:
@@ -99,21 +98,21 @@ If you get stuck, check [`docs/architecture.md`](docs/architecture.md) for firmw
 - **Nuvoton NuMaker-M258KG**
   - Cortex-M23-based evaluation board.
   - On-board Nu-Link2-Me debugger/programmer.
-  - Designed for project evaluation and prototype development. [web:168]
+  - Designed for project evaluation and prototype development. 
 
 ### Robotic Hand
 
 - **Amazing Hand**
   - Open-source 3D-printable robotic hand.
   - 8 DOF, 4 fingers, ~400 g weight.
-  - Designed for 8 × Feetech SCS0009 servos. [web:84]
+  - Designed for 8 × Feetech SCS0009 servos. 
 
 ### Servos
 
 - **Feetech SCS0009**
   - 6 V, 2.3 kg serial bus smart servo.
   - TTL-level half-duplex serial communication.
-  - Feedback: position, speed, voltage, current, temperature, load. [web:156][web:176]
+  - Feedback: position, speed, voltage, current, temperature, load. 
 
 ### Power
 
@@ -202,9 +201,9 @@ Possible next steps:
 
 ## Acknowledgments
 
-- **Amazing Hand** project by Pollen Robotics (open-source hand design and documentation). [web:84]
-- **Feetech SCS0009** servo documentation and protocol manual. [web:156][web:176]
-- **Nuvoton NuMaker-M258KG** documentation and example projects. [web:168]
+- **Amazing Hand** project by Pollen Robotics (open-source hand design and documentation). 
+- **Feetech SCS0009** servo documentation and protocol manual. 
+- **Nuvoton NuMaker-M258KG** documentation and example projects.
 
 ---
 
@@ -217,7 +216,7 @@ Possible next steps:
 ## Contact
 
 (Add your contact or project communication channel here.)
-=======
+
 # RoboticsHand
 3D-printed robotic hand with NuMaker
->>>>>>> 2bda626164ed830d4f05822a7dfeda8da8062dd8
+
